@@ -10,4 +10,6 @@ This project is a simplified version of one I had to make for a customer not too
 I decided to (at least temporarily) remove all of its specialised searches/methods/aggregations and publish it, both for future me and for anyone in need of code or examples.  
 
 I wouldn't use this as a library, I don't think that this could ever become a "complete" project.  
-It is rather a starting point to customise as needed, no restrictions whatsoever.
+It is rather a starting point to customise as needed, no restrictions whatsoever.  
+
+Some (basic) examples can be found in *src/test*.
