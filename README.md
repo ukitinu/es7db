@@ -1,5 +1,6 @@
 # Elasticsearch 7 Database
-## Simple Java implementation of Elasticsearch 7's APIs
+## Simple Java implementation of Elasticsearch 7 APIs
+* Java 8+.
 * Easily configurable through an external *.properties* file.  
 * Simple interface to manage document creation/deletion/update, both in single and in bulk.  
 * Rich and adaptable query creation.  
