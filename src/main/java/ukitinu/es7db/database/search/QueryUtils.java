@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Builds query out of a JSONObject.
+ * Builds query out of a Map<String, Object> (with JSONs in mind).
  */
 public final class QueryUtils
 {

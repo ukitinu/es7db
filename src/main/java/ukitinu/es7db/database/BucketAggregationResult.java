@@ -1,9 +1,9 @@
 package ukitinu.es7db.database;
 
-import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BucketAggregationResult
@@ -36,15 +36,14 @@ public class BucketAggregationResult
         return otherCount;
     }
 
-    @SuppressWarnings("unchecked")
-    public JSONObject asJson()
+    public Map<String, Object> asMap()
     {
-        JSONObject json = new JSONObject();
-        json.put(LIST, entryList.stream().map(Entry::asJson).collect(Collectors.toList()));
+        Map<String, Object> map = new HashMap<>();
+        map.put(LIST, entryList.stream().map(Entry::asMap).collect(Collectors.toList()));
         if (otherCount != -1L) {
-            json.put(OTHER_COUNT, otherCount);
+            map.put(OTHER_COUNT, otherCount);
         }
-        return json;
+        return map;
     }
 
     public static final class Entry
@@ -68,13 +67,12 @@ public class BucketAggregationResult
             return count;
         }
 
-        @SuppressWarnings("unchecked")
-        private JSONObject asJson()
+        private Map<String, Object> asMap()
         {
-            JSONObject json = new JSONObject();
-            json.put(KEY, key);
-            json.put(COUNT, count);
-            return json;
+            Map<String, Object> map = new HashMap<>();
+            map.put(KEY, key);
+            map.put(COUNT, count);
+            return map;
         }
     }
 }

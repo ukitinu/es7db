@@ -2,9 +2,10 @@ package ukitinu.es7db.database.search;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.json.simple.JSONObject;
 import ukitinu.es7db.commons.Utils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class CoordinatePoint
@@ -52,10 +53,9 @@ public class CoordinatePoint
         return new GeoPoint(lat, lon);
     }
 
-    @SuppressWarnings("unchecked")
-    public JSONObject asJson()
+    public Map<String, Double> asMap()
     {
-        JSONObject object = new JSONObject();
+        Map<String, Double> object = new HashMap<>();
         object.put("lat", lat);
         object.put("lon", lon);
         return object;
