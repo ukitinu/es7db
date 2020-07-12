@@ -5,7 +5,7 @@ import ukitinu.es7db.database.search.Query;
 import ukitinu.es7db.database.search.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.apache.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -25,14 +25,14 @@ public class DatabaseManager
     public Document getDocument(String index, String id) throws DatabaseException
     {
         Document document = databaseClient.getDocument(index, id);
-        if (document == null) throw new DatabaseException(index + "/" + id + " not found", HttpStatus.NOT_FOUND);
+        if (document == null) throw new DatabaseException(index + "/" + id + " not found", HttpStatus.SC_NOT_FOUND);
         return document;
     }
 
     public Document popDocument(String index, String id) throws DatabaseException
     {
         Document document = databaseClient.getDocument(index, id);
-        if (document == null) throw new DatabaseException(index + "/" + id + " not found", HttpStatus.NOT_FOUND);
+        if (document == null) throw new DatabaseException(index + "/" + id + " not found", HttpStatus.SC_NOT_FOUND);
         deleteSingle(index, id);
         return document;
     }
@@ -93,7 +93,7 @@ public class DatabaseManager
     public Document getFirstDocument(Search search) throws DatabaseException
     {
         SearchResult result = search(search);
-        if (result.getDocuments().isEmpty()) throw new DatabaseException("Document not found", HttpStatus.NOT_FOUND);
+        if (result.getDocuments().isEmpty()) throw new DatabaseException("Document not found", HttpStatus.SC_NOT_FOUND);
         return result.getDocuments().get(0);
     }
 
