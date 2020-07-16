@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
-public class Query implements Queryable
-{
+public class Query implements Queryable {
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     private final FilterElements filterList = new FilterElements();
@@ -20,129 +19,108 @@ public class Query implements Queryable
     private final FilterElements shouldNotList = new FilterElements();
     private int minimumShould = DatabaseConstants.MINIMUM_SHOULD_UNDEFINED;
 
-    FilterElements getFilter()
-    {
+    FilterElements getFilter() {
         return filterList;
     }
 
-    MustElements getMust()
-    {
+    MustElements getMust() {
         return mustList;
     }
 
-    FilterElements getMustNot()
-    {
+    FilterElements getMustNot() {
         return mustNotList;
     }
 
-    FilterElements getShouldList()
-    {
+    FilterElements getShouldList() {
         return shouldList;
     }
 
-    FilterElements getShouldNotList()
-    {
+    FilterElements getShouldNotList() {
         return shouldNotList;
     }
 
-    public boolean hasShoulds()
-    {
+    public boolean hasShoulds() {
         return !shouldList.getElements().isEmpty() || !shouldNotList.getElements().isEmpty();
     }
 
     //region filters
-    public Query filterTerm(String field, Object... values)
-    {
+    public Query filterTerm(String field, Object... values) {
         filterList.addTerm(field, values);
         return this;
     }
 
-    public Query filterRange(String field, Object value, RangeParameter parameter)
-    {
+    public Query filterRange(String field, Object value, RangeParameter parameter) {
         filterList.addRange(field, value, parameter);
         return this;
     }
 
-    public Query filterExists(String field)
-    {
+    public Query filterExists(String field) {
         filterList.addExists(field);
         return this;
     }
 
-    public Query filterGeoBox(String field, CoordinatePoint topLeft, CoordinatePoint bottomRight)
-    {
+    public Query filterGeoBox(String field, CoordinatePoint topLeft, CoordinatePoint bottomRight) {
         filterList.addGeoBox(field, topLeft, bottomRight);
         return this;
     }
 
-    public Query filterGeoCircle(String field, CoordinatePoint centre, Distance distance)
-    {
+    public Query filterGeoCircle(String field, CoordinatePoint centre, Distance distance) {
         filterList.addGeoCircle(field, centre, distance);
         return this;
     }
 
-    public Query filterGeoPolygon(String field, CoordinatePoint p1, CoordinatePoint p2, CoordinatePoint p3, CoordinatePoint... points)
-    {
+    public Query filterGeoPolygon(String field, CoordinatePoint p1, CoordinatePoint p2, CoordinatePoint p3, CoordinatePoint... points) {
         filterList.addGeoPolygon(field, p1, p2, p3, points);
         return this;
     }
     //endregion
 
     //region must
-    public Query mustMatch(String field, String text, boolean isFuzzy)
-    {
+    public Query mustMatch(String field, String text, boolean isFuzzy) {
         mustList.addMatch(field, text, isFuzzy);
         return this;
     }
     //endregion
 
     //region must_not
-    public Query mustNotTerm(String field, Object... values)
-    {
+    public Query mustNotTerm(String field, Object... values) {
         mustNotList.addTerm(field, values);
         return this;
     }
 
-    public Query mustNotRange(String field, Object value, RangeParameter parameter)
-    {
+    public Query mustNotRange(String field, Object value, RangeParameter parameter) {
         mustNotList.addRange(field, value, parameter);
         return this;
     }
 
-    public Query mustNotExists(String field)
-    {
+    public Query mustNotExists(String field) {
         mustNotList.addExists(field);
         return this;
     }
 
-    public Query mustNotGeoBox(String field, CoordinatePoint topLeft, CoordinatePoint bottomRight)
-    {
+    public Query mustNotGeoBox(String field, CoordinatePoint topLeft, CoordinatePoint bottomRight) {
         mustNotList.addGeoBox(field, topLeft, bottomRight);
         return this;
     }
 
-    public Query mustNotGeoCircle(String field, CoordinatePoint centre, Distance distance)
-    {
+    public Query mustNotGeoCircle(String field, CoordinatePoint centre, Distance distance) {
         mustNotList.addGeoCircle(field, centre, distance);
         return this;
     }
 
-    public Query mustNotGeoPolygon(String field, CoordinatePoint p1, CoordinatePoint p2, CoordinatePoint p3, CoordinatePoint... points)
-    {
+    public Query mustNotGeoPolygon(String field, CoordinatePoint p1, CoordinatePoint p2, CoordinatePoint p3, CoordinatePoint... points) {
         mustNotList.addGeoPolygon(field, p1, p2, p3, points);
         return this;
     }
     //endregion
 
     //region should
-    public Query minimumShould(int minimumShould)
-    {
+    public Query minimumShould(int minimumShould) {
         this.minimumShould = minimumShould;
         return this;
     }
 
-    public Query shouldTerm(boolean truth, String field, Object... values)
-    {
+    public Query shouldTerm(boolean truth, String field, Object... values) {
         if (truth) {
             shouldList.addTerm(field, values);
         } else {
@@ -151,8 +129,7 @@ public class Query implements Queryable
         return this;
     }
 
-    public Query shouldRange(boolean truth, String field, Object value, RangeParameter parameter)
-    {
+    public Query shouldRange(boolean truth, String field, Object value, RangeParameter parameter) {
         if (truth) {
             shouldList.addRange(field, value, parameter);
         } else {
@@ -161,8 +138,7 @@ public class Query implements Queryable
         return this;
     }
 
-    public Query shouldExists(boolean truth, String field)
-    {
+    public Query shouldExists(boolean truth, String field) {
         if (truth) {
             shouldList.addExists(field);
         } else {
@@ -171,8 +147,7 @@ public class Query implements Queryable
         return this;
     }
 
-    public Query shouldGeoBox(boolean truth, String field, CoordinatePoint topLeft, CoordinatePoint bottomRight)
-    {
+    public Query shouldGeoBox(boolean truth, String field, CoordinatePoint topLeft, CoordinatePoint bottomRight) {
         if (truth) {
             shouldList.addGeoBox(field, topLeft, bottomRight);
         } else {
@@ -181,8 +156,7 @@ public class Query implements Queryable
         return this;
     }
 
-    public Query shouldGeoCircle(boolean truth, String field, CoordinatePoint centre, Distance distance)
-    {
+    public Query shouldGeoCircle(boolean truth, String field, CoordinatePoint centre, Distance distance) {
         if (truth) {
             shouldList.addGeoCircle(field, centre, distance);
         } else {
@@ -191,8 +165,7 @@ public class Query implements Queryable
         return this;
     }
 
-    public Query shouldGeoPolygon(boolean truth, String field, CoordinatePoint p1, CoordinatePoint p2, CoordinatePoint p3, CoordinatePoint... points)
-    {
+    public Query shouldGeoPolygon(boolean truth, String field, CoordinatePoint p1, CoordinatePoint p2, CoordinatePoint p3, CoordinatePoint... points) {
         if (truth) {
             shouldList.addGeoPolygon(field, p1, p2, p3, points);
         } else {
@@ -203,8 +176,7 @@ public class Query implements Queryable
     //endregion
 
     @Override
-    public QueryBuilder toQuery()
-    {
+    public QueryBuilder toQuery() {
         if (hasShoulds() && minimumShould == DatabaseConstants.MINIMUM_SHOULD_UNDEFINED) {
             LOG.warn("Should[Not] entries without setting minimum_should, default to {}", DatabaseConstants.MINIMUM_SHOULD_DEFAULT);
             return toQuery(DatabaseConstants.MINIMUM_SHOULD_DEFAULT);
@@ -212,8 +184,7 @@ public class Query implements Queryable
         return toQuery(minimumShould);
     }
 
-    private QueryBuilder toQuery(int minimumShould)
-    {
+    private QueryBuilder toQuery(int minimumShould) {
         BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
         addQueries(filterList.getElements(), queryBuilder::filter);
         addQueries(mustList.getElements(), queryBuilder::must);
@@ -224,8 +195,7 @@ public class Query implements Queryable
         return queryBuilder;
     }
 
-    private void addQueries( Iterable<? extends Queryable> list, Consumer<? super QueryBuilder> addQuery)
-    {
+    private void addQueries(Iterable<? extends Queryable> list, Consumer<? super QueryBuilder> addQuery) {
         for (Queryable element : list) {
             addQuery.accept(element.toQuery());
         }

@@ -6,17 +6,21 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class RestBodyChecker
-{
-    private RestBodyChecker()
-    {
-        throw new IllegalStateException("Utils class");
+public final class RestBodyChecker {
+    private RestBodyChecker() {
+        throw new IllegalStateException("Utility class");
     }
 
-    static void checkInput(Map<String, Object> input,
-                           RestFieldSet required,
-                           RestFieldSet optional)
-    {
+    /**
+     * Checks that all required fields are present and of correct type and that all optional fields are of correct type.
+     * if this is not the case throws an {@link IllegalArgumentException} with message
+     * detailing the problems.
+     *
+     * @param input    request body.
+     * @param required required fields.
+     * @param optional optional fields.
+     */
+    public static void checkInput(Map<String, Object> input, RestFieldSet required, RestFieldSet optional) {
         Collection<String> missing = new HashSet<>();
         Collection<String> badType = new HashSet<>();
         checkRequired(input, required, missing, badType);
@@ -24,8 +28,13 @@ public final class RestBodyChecker
         sendErrorResponse(missing, badType);
     }
 
-    public static void retain(Map<String, Object> input, RestFieldSet... retainedSets)
-    {
+    /**
+     * Removes from the body all fields not listed in at least one of the {@param retainedSets}.
+     *
+     * @param input        request body.
+     * @param retainedSets field to maintain (if empty, response is empty too).
+     */
+    public static void retain(Map<String, Object> input, RestFieldSet... retainedSets) {
         if (retainedSets == null || retainedSets.length == 0) {
             input.clear();
         } else {
@@ -40,15 +49,12 @@ public final class RestBodyChecker
             for (String key : input.keySet()) {
                 if (!toRetain.contains(key)) toRemove.add(key);
             }
-            for(String key : toRemove) input.remove(key);
+            for (String key : toRemove) input.remove(key);
         }
     }
 
-    private static void checkRequired(Map<String, Object> input,
-                                      RestFieldSet required,
-                                      Collection<? super String> missing,
-                                      Collection<? super String> badType)
-    {
+    private static void checkRequired(Map<String, Object> input, RestFieldSet required,
+                                      Collection<? super String> missing, Collection<? super String> badType) {
         for (RestField<?> field : required.getSet()) {
             String name = field.getName();
             if (!input.containsKey(name)) {
@@ -59,10 +65,7 @@ public final class RestBodyChecker
         }
     }
 
-    private static void checkOptional(Map<String, Object> input,
-                                      RestFieldSet optional,
-                                      Collection<? super String> badType)
-    {
+    private static void checkOptional(Map<String, Object> input, RestFieldSet optional, Collection<? super String> badType) {
         for (RestField<?> field : optional.getSet()) {
             String name = field.getName();
             if (input.containsKey(name)) {
@@ -73,9 +76,7 @@ public final class RestBodyChecker
         }
     }
 
-    private static void sendErrorResponse(Collection<String> missing,
-                                          Collection<String> badType)
-    {
+    private static void sendErrorResponse(Collection<String> missing, Collection<String> badType) {
         String missingFields = missing.isEmpty() ? "" : String.join(", ", missing);
         String badTypeFields = badType.isEmpty() ? "" : String.join(", ", badType);
         if (!missingFields.isEmpty() || !badTypeFields.isEmpty()) {

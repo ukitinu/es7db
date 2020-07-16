@@ -68,11 +68,6 @@ public final class QueryUtils
         }
     }
 
-    public static void addFilterGeoBox(Query query, String geoField, Map<String, Object> box)
-    {
-        addGeoBox(query.getFilter(), geoField, box);
-    }
-
     private static void addMustMatch(Query query, Map<String, Object> match)
     {
         String field = (String) match.get(FIELD_KEY);

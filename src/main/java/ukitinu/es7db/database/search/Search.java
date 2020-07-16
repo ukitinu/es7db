@@ -5,9 +5,7 @@ import ukitinu.es7db.config.Property;
 
 import java.util.Objects;
 
-
-public final class Search
-{
+public final class Search {
     private static final int PAGINATION_THRESHOLD = 10_000;
     private static final int DEFAULT_FROM = Property.ES_SEARCH_FROM.getInt();
     private static final int DEFAULT_SIZE = Property.ES_SEARCH_SIZE.getInt();
@@ -20,43 +18,35 @@ public final class Search
 
     private boolean isScroll;
 
-    private Search()
-    {
+    private Search() {
         //use the Builder class
     }
 
-    public String getIndex()
-    {
+    public String getIndex() {
         return index;
     }
 
-    public Query getQuery()
-    {
+    public Query getQuery() {
         return query;
     }
 
-    public SortElement getSort()
-    {
+    public SortElement getSort() {
         return sort;
     }
 
-    public int getFrom()
-    {
+    public int getFrom() {
         return from;
     }
 
-    public int getSize()
-    {
+    public int getSize() {
         return size;
     }
 
-    public boolean isScroll()
-    {
+    public boolean isScroll() {
         return isScroll;
     }
 
-    public SearchSourceBuilder toSearch()
-    {
+    public SearchSourceBuilder toSearch() {
         SearchSourceBuilder search = new SearchSourceBuilder();
         search.query(query.toQuery());
         if (sort != null) {
@@ -69,8 +59,7 @@ public final class Search
         return search;
     }
 
-    public static class Builder
-    {
+    public static class Builder {
         private final Query query;
         private final String index;
         private SortElement sort;
@@ -78,8 +67,7 @@ public final class Search
         private int size;
         private boolean isScroll;
 
-        public Builder(String index, Query query)
-        {
+        public Builder(String index, Query query) {
             Objects.requireNonNull(index, "Search index must not be null");
             Objects.requireNonNull(query, "Search query must not be null");
             this.index = index;
@@ -90,33 +78,33 @@ public final class Search
             this.isScroll = false;
         }
 
-        public Builder sortBy(String field, boolean isAscending)
-        {
-            this.sort = new SortElement(field, isAscending);
+        public Builder sortBy(String field, boolean isAscending) {
+            sortBy(new SortElement(field, isAscending));
             return this;
         }
 
-        public Builder withBounds(int from, int size)
-        {
+        public Builder sortBy(SortElement sort) {
+            this.sort = sort;
+            return this;
+        }
+
+        public Builder withBounds(int from, int size) {
             this.from = from;
             this.size = size;
             return this;
         }
 
-        public Builder scroll()
-        {
+        public Builder scroll() {
             this.isScroll = true;
             return this;
         }
 
-        public Search build()
-        {
+        public Search build() {
             validate();
             return create();
         }
 
-        private Search create()
-        {
+        private Search create() {
             Search search = new Search();
             search.index = this.index;
             search.query = this.query;
@@ -127,8 +115,7 @@ public final class Search
             return search;
         }
 
-        private void validate()
-        {
+        private void validate() {
             StringBuilder errors = new StringBuilder();
             if (from + size > PAGINATION_THRESHOLD) {
                 errors.append("Pagination threshold exceeded: size + from = ")
@@ -136,12 +123,12 @@ public final class Search
                         .append(System.lineSeparator());
             }
             if (from < 0) {
-                errors.append("From value negative: ")
+                errors.append("\"from\" value negative: ")
                         .append(from)
                         .append(System.lineSeparator());
             }
             if (size < 0) {
-                errors.append("Size value negative: ")
+                errors.append("\"size\" value negative: ")
                         .append(size)
                         .append(System.lineSeparator());
             }
