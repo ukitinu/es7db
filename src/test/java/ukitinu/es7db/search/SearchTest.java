@@ -1,13 +1,14 @@
 package ukitinu.es7db.search;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 import ukitinu.es7db.config.Property;
 
-public class SearchTest extends TestCase
-{
+import static org.junit.jupiter.api.Assertions.*;
 
-    public void testSearchClass()
-    {
+public class SearchTest {
+
+    @Test
+    public void testClass() {
         Query query = new Query().filterTerm("status_field", "status_value");
 
         Search search = new Search.Builder("my_index", query)
@@ -16,7 +17,7 @@ public class SearchTest extends TestCase
         assertEquals(Property.ES_SEARCH_SIZE.getInt(), search.getSize());
         assertEquals(Property.ES_SEARCH_FROM.getInt(), search.getFrom());
         assertFalse(search.isScroll());
-        System.out.println(search.toSearch());
+        assertDoesNotThrow(search::toSearch);
 
         Search scrollSearch = new Search.Builder("new_index", query)
                 .sortBy("new_sort_field", true)
@@ -24,6 +25,6 @@ public class SearchTest extends TestCase
                 .build();
         assertTrue(scrollSearch.isScroll());
         assertEquals("new_index", scrollSearch.getIndex());
-        System.out.println(scrollSearch.toSearch());
+        assertDoesNotThrow(scrollSearch::toSearch);
     }
 }

@@ -1,10 +1,13 @@
 package ukitinu.es7db.search;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class QueryTest extends TestCase
-{
-    public void testQueryClass()
+import static org.junit.jupiter.api.Assertions.*;
+
+public class QueryTest {
+
+    @Test
+    public void testClass()
     {
         Query query = new Query()
                 .filterExists("mustexist")
@@ -31,7 +34,7 @@ public class QueryTest extends TestCase
                 .shouldTerm(false, "should_string_7", "negative")
                 .minimumShould(4);
 
-        System.out.println(query.toQuery());
+        assertDoesNotThrow(query::toQuery);
     }
 
 }

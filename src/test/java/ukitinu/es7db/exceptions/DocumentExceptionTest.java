@@ -1,10 +1,13 @@
 package ukitinu.es7db.exceptions;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class DocumentExceptionTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-    public void testGetMessage() {
+class DocumentExceptionTest {
+
+    @Test
+    void getMessage() {
         DocumentException e1 = new DocumentException("message", "index", "id");
         DocumentException e2 = new DocumentException("message", "index", "id", "field.path.here");
         assertEquals("index/id: message", e1.getMessage());

@@ -1,12 +1,13 @@
 package ukitinu.es7db.search;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class DistanceTest extends TestCase
-{
+import static org.junit.jupiter.api.Assertions.*;
 
-    public void testConvertLength()
-    {
+class DistanceTest {
+
+    @Test
+    void convertLength() {
         Distance distance1 = new Distance(10, DistanceUnit.KM);
         assertEquals(10_000.0, distance1.convertLength(DistanceUnit.M), 0.0001);
         assertEquals(1_000_000.0, distance1.convertLength(DistanceUnit.CM), 0.0001);
@@ -20,8 +21,8 @@ public class DistanceTest extends TestCase
         assertEquals(0.8, distance3.convertLength(DistanceUnit.M), 0.0001);
     }
 
-    public void testCompareTo()
-    {
+    @Test
+    void compareTo() {
         Distance distance1 = new Distance(1.07, DistanceUnit.M);
         Distance distance2 = new Distance(600, DistanceUnit.CM);
         assertTrue(distance1.compareTo(distance2) < 0);
