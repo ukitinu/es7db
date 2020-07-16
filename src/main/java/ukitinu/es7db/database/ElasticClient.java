@@ -98,7 +98,7 @@ final class ElasticClient
                 .build();
     }
 
-    Document getDocument(String index, String id) throws DatabaseException
+    Document get(String index, String id) throws DatabaseException
     {
         try {
             GetRequest request = new GetRequest(index, id);
@@ -126,7 +126,7 @@ final class ElasticClient
         bulkProcessor.add(request);
     }
 
-    boolean isExists(String index, String id) throws DatabaseException
+    boolean exists(String index, String id) throws DatabaseException
     {
         try {
             GetRequest request = new GetRequest(index, id);
