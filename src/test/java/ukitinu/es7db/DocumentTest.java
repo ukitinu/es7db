@@ -61,7 +61,7 @@ class DocumentTest {
 
     @Test
     void put() {
-        assertThrows(DocumentException.class, () -> doc.put("new_value_here","fake", "field", "path"));
+        assertThrows(DocumentException.class, () -> doc.put("new_value_here", "fake", "field", "path"));
 
         assertNull(doc.put("very_new_value", "completely_new_field"));
         assertEquals("very_new_value", doc.get("completely_new_field"));
@@ -76,8 +76,7 @@ class DocumentTest {
     @Test
     void get() {
         assertThrows(DocumentException.class, () -> doc.get("fake", "field", "path"));
-
-        assertNull(doc.get("non_existing_field"));
+        assertThrows(DocumentException.class, () -> doc.get("non_existing_field"));
 
         assertEquals("string value", doc.get("str"));
         assertEquals(10.4, doc.get("double"));
