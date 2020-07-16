@@ -1,5 +1,8 @@
 package ukitinu.es7db.database;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ukitinu.es7db.database.exceptions.DocumentException;
 import ukitinu.es7db.database.search.CoordinatePoint;
 import org.elasticsearch.action.get.GetResponse;
@@ -8,171 +11,102 @@ import org.elasticsearch.search.SearchHit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-public class Document
-{
-    private static final String LAT = "lat";
-    private static final String LON = "lon";
+public class Document {
+    private static final ObjectMapper ENTITY_MAPPER = new ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final String index;
     private final String id;
     private final Map<String, Object> source;
 
-    public Document(String index, String id, Map<String, Object> source)
-    {
+    public Document(String index, String id, Map<String, Object> source) {
         this.index = index;
         this.id = id;
         this.source = source;
     }
 
-    Document(SearchHit hit)
-    {
+    Document(SearchHit hit) {
         this.index = hit.getIndex();
         this.id = hit.getId();
         this.source = hit.getSourceAsMap();
     }
 
-    Document(GetResponse getResponse)
-    {
+    Document(GetResponse getResponse) {
         this.index = getResponse.getIndex();
         this.id = getResponse.getId();
         this.source = getResponse.getSourceAsMap();
     }
 
-    public String getIndex()
-    {
+    public String getIndex() {
         return index;
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public Map<String, Object> getSource()
-    {
+    public Map<String, Object> getSource() {
         return new HashMap<>(source);
     }
 
-    public boolean isNullOrEmpty(String field, String... fields)
-    {
+    public boolean isNullOrEmpty(String field, String... fields) {
         String[] fullPath = buildPath(field, fields);
         return getValue(fullPath) == null;
     }
 
-    public String getString(String field, String... fields)
-    {
+    public Object put(Object value, String field, String... fields) {
+        String[] fullPath = buildPath(field, fields);
+        return putValue(value, fullPath);
+    }
+
+    //region get
+    public <T> T get(String field, String... fields) {
         try {
-            return getSingle(field, fields);
+            return getSingleInternal(field, fields);
         } catch (ClassCastException e) {
             throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
         }
     }
 
-    public List<String> getStringList(String field, String... fields)
-    {
+    public <T> List<T> getList(String field, String... fields) {
         try {
-            return getList(field, fields);
+            return getListInternal(field, fields);
         } catch (ClassCastException e) {
             throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
         }
     }
 
-    public Long getLong(String field, String... fields)
-    {
+    public Long getLong(String field, String... fields) {
         try {
-            String numberString = getSingle(field, fields).toString();
+            String numberString = getSingleInternal(field, fields).toString();
             return Long.parseLong(numberString);
         } catch (ClassCastException e) {
             throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
         }
     }
 
-    public List<Long> getLongList(String field, String... fields)
-    {
+    public List<Long> getLongList(String field, String... fields) {
         try {
-            List<Object> list = getList(field, fields);
+            List<Object> list = getListInternal(field, fields);
             return list.stream().map(Object::toString).map(Long::parseLong).collect(Collectors.toList());
         } catch (ClassCastException e) {
             throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
         }
     }
 
-    public Double getDouble(String field, String... fields)
-    {
+    public CoordinatePoint getCoordinate(String field, String... fields) {
         try {
-            return getSingle(field, fields);
-        } catch (ClassCastException e) {
-            throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
-        }
-    }
-
-
-    public List<Double> getDoubleList(String field, String... fields)
-    {
-        try {
-            return getList(field, fields);
-        } catch (ClassCastException e) {
-            throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
-        }
-    }
-
-
-    public Map<String, Object> getMap(String field, String... fields)
-    {
-        try {
-            return getSingle(field, fields);
-        } catch (ClassCastException e) {
-            throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
-        }
-    }
-
-
-    public List<Map<String, Object>> getMapList(String field, String... fields)
-    {
-        try {
-            return getList(field, fields);
-        } catch (ClassCastException e) {
-            throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
-        }
-    }
-
-
-    public Boolean getBoolean(String field, String... fields)
-    {
-        try {
-            return getSingle(field, fields);
-        } catch (ClassCastException e) {
-            throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
-        }
-    }
-
-
-    public List<Boolean> getBooleanList(String field, String... fields)
-    {
-        try {
-            return getList(field, fields);
-        } catch (ClassCastException e) {
-            throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
-        }
-    }
-
-
-    public CoordinatePoint getCoordinate(String field, String... fields)
-    {
-        try {
-            String point = getString(field, fields);
+            String point = get(field, fields);
             return new CoordinatePoint(point);
         } catch (ClassCastException e) {
             throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
         }
     }
 
-
-    public List<CoordinatePoint> getCoordinateList(String field, String... fields)
-    {
+    public List<CoordinatePoint> getCoordinateList(String field, String... fields) {
         try {
-            List<String> points = getStringList(field, fields);
+            List<String> points = getList(field, fields);
             return points
                     .stream()
                     .map(CoordinatePoint::new)
@@ -181,10 +115,11 @@ public class Document
             throw new DocumentException(e.getMessage(), index, id, String.join(".", buildPath(field, fields)));
         }
     }
+    //endregion
 
+    //region get_internal
     @SuppressWarnings("unchecked")
-    private <T> T getSingle(String field, String... fields)
-    {
+    private <T> T getSingleInternal(String field, String... fields) {
         String[] fullPath = buildPath(field, fields);
         Object obj = getValue(fullPath);
         if (obj == null) throw new DocumentException("Null value", index, id, String.join(".", fullPath));
@@ -192,8 +127,7 @@ public class Document
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<T> getList(String field, String... fields)
-    {
+    private <T> List<T> getListInternal(String field, String... fields) {
         String[] fullPath = buildPath(field, fields);
         Object obj = getValue(fullPath);
         if (obj == null) return Collections.emptyList();
@@ -204,24 +138,18 @@ public class Document
         }
     }
 
+    private Object getValue(String... path) {
+        Map<String, Object> lastObject = explore(path);
+        return lastObject.get(path[path.length - 1]);
+    }
+    //endregion
 
-    private Object getValue(String... path)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        Map<String, Object> current = source;
-        int i = 0;
-        while (i < path.length - 1) {
-            Object newCurrent = getValue(current, path[i], sb);
-            current = getMap(newCurrent, sb.toString());
-            i++;
-        }
-        return getValue(current, path[i], sb);
+    private Object putValue(Object value, String... path) {
+        Map<String, Object> lastObject = explore(path);
+        return lastObject.put(path[path.length - 1], value);
     }
 
-
-    private String[] buildPath(String field, String... fields)
-    {
+    private String[] buildPath(String field, String... fields) {
         Objects.requireNonNull(field, "First entry of path must not be null");
         if (fields == null || fields.length == 0) return new String[]{field};
         String[] path = new String[1 + fields.length];
@@ -230,25 +158,36 @@ public class Document
         return path;
     }
 
+    //region explore
+    private Map<String, Object> explore(String... path) {
+        StringBuilder sb = new StringBuilder();
 
-    private Object getValue(Map<String, Object> current, String field, StringBuilder path)
-    {
-        checkPath(current, field, path);
-        return current.get(field);
+        Map<String, Object> current = source;
+        int i = 0;
+        while (i < path.length - 1) {
+            checkPath(current, path[i], sb);
+            Object newCurrent = current.get(path[i]);
+            current = getMap(newCurrent, sb.toString());
+            i++;
+        }
+
+        if (!current.containsKey(path[path.length - 1])) {
+            throw new DocumentException("Field not found", index, id, String.join(".", path));
+        }
+
+        return current;
     }
 
-    private void checkPath(Map<String, Object> current, String field, StringBuilder path)
-    {
-        path.append(field);
+    private void checkPath(Map<String, Object> current, String field, StringBuilder sb) {
+        sb.append(field);
         if (!current.containsKey(field)) {
-            throw new DocumentException("Field not found", index, id, path.toString());
+            throw new DocumentException("Field not found", index, id, sb.toString());
         }
-        path.append(".");
+        sb.append(".");
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getMap(Object obj, String path)
-    {
+    private Map<String, Object> getMap(Object obj, String path) {
         if (obj == null) throw new DocumentException("Value is null", index, id, path);
         try {
             return (Map<String, Object>) obj;
@@ -256,4 +195,5 @@ public class Document
             throw new DocumentException("Not a map", index, id, path.substring(0, path.length() - 1));
         }
     }
+    //endregion
 }
