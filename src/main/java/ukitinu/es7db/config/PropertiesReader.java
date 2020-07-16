@@ -25,7 +25,6 @@ final class PropertiesReader
     static {
         try (InputStream is = getConfigurationFileStream()) {
             properties.load(is);
-            loadPropertyValues();
         } catch (Exception e) {
             LOG.error(e.getMessage());
             LOG.error(SYSTEM_EXIT);
@@ -38,17 +37,8 @@ final class PropertiesReader
         return new FileInputStream(PUBLIC_PROP_FILENAME);
     }
 
-    private static void loadPropertyValues()
+    static String getValue(String name)
     {
-        for (Property property : Property.values()) {
-            loadPropertyValue(property);
-        }
-    }
-
-    private static void loadPropertyValue(Property property)
-    {
-        String name = property.getName();
-        String value = properties.getProperty(name);
-        property.setValue(value);
+        return properties.getProperty(name);
     }
 }

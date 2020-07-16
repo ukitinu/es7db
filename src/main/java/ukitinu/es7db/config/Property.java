@@ -23,12 +23,13 @@ public enum Property
 
     private final String name;
     private final String defaultValue;
-    private String value;
+    private final String value;
 
     Property(String name, String defaultValue)
     {
         this.name = name;
         this.defaultValue = defaultValue;
+        this.value = PropertiesReader.getValue(name);
     }
 
     String getName()
@@ -36,20 +37,10 @@ public enum Property
         return name;
     }
 
-    void setValue(String value)
-    {
-        if (value == null) {
-            LOG.warn(UNABLE_TO_FIND + name + USING_DEFAULT + defaultValue);
-        } else {
-            LOG.info(name + PROP_SET_TO + value);
-        }
-        this.value = value;
-    }
-
     public String getString()
     {
         if (value == null) {
-            LOG.debug(UNABLE_TO_FIND + name + USING_DEFAULT + defaultValue);
+            LOG.debug(USING_DEFAULT, name, defaultValue);
             return defaultValue;
         }
         return value;
@@ -60,9 +51,13 @@ public enum Property
         return Integer.parseInt(getString());
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(PropertiesReader.class);
+    @Override
+    public String toString()
+    {
+        return getString();
+    }
 
-    private static final String UNABLE_TO_FIND = "Unable to find ";
-    private static final String USING_DEFAULT = ", using default value ";
-    private static final String PROP_SET_TO = " set to ";
+    private static final Logger LOG = LoggerFactory.getLogger(Property.class);
+
+    private static final String USING_DEFAULT = "Unable to find {}, using default value {}";
 }
