@@ -1,8 +1,10 @@
 package ukitinu.es7db.database;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.simple.JSONObject;
 import ukitinu.es7db.database.exceptions.DocumentException;
 import ukitinu.es7db.database.search.CoordinatePoint;
 import org.elasticsearch.action.get.GetResponse;
@@ -48,6 +50,14 @@ public class Document {
 
     public Map<String, Object> getSource() {
         return new HashMap<>(source);
+    }
+
+    public <E> E toEntity(Class<E> entityClass) throws DocumentException {
+        try {
+            return ENTITY_MAPPER.readValue(new JSONObject(source).toString(), entityClass);
+        } catch (JsonProcessingException e) {
+            throw new DocumentException("Error converting to " + entityClass.getSimpleName(), index, id);
+        }
     }
 
     public boolean isNullOrEmpty(String field, String... fields) {
