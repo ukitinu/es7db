@@ -62,9 +62,16 @@ public class Document {
 
     public boolean isNullOrEmpty(String field, String... fields) {
         String[] fullPath = buildPath(field, fields);
-        return getValue(fullPath) == null;
+        Object value = getValue(fullPath);
+        boolean isNull = value == null;
+        boolean isCollectionEmpty = value instanceof Collection && ((Collection<?>) value).isEmpty();
+        boolean isMapEmpty = value instanceof Map && ((Map<?, ?>) value).isEmpty();
+        return isNull || isCollectionEmpty || isMapEmpty;
     }
 
+    /**
+     * Counterintuitively the value to assign is the first parameter, to maintain the varargs structure.
+     */
     public Object put(Object value, String field, String... fields) {
         String[] fullPath = buildPath(field, fields);
         return putValue(value, fullPath);
@@ -171,7 +178,6 @@ public class Document {
     //region explore
     private Map<String, Object> explore(String... path) {
         StringBuilder sb = new StringBuilder();
-
         Map<String, Object> current = source;
         int i = 0;
         while (i < path.length - 1) {
@@ -180,11 +186,6 @@ public class Document {
             current = getMap(newCurrent, sb.toString());
             i++;
         }
-
-        if (!current.containsKey(path[path.length - 1])) {
-            throw new DocumentException("Field not found", index, id, String.join(".", path));
-        }
-
         return current;
     }
 

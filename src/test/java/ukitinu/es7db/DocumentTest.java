@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test;
 import ukitinu.es7db.exceptions.DocumentException;
 import ukitinu.es7db.search.CoordinatePoint;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +24,7 @@ class DocumentTest {
         source.put("long", 9876543210L);
         source.put("int", 77);
         source.put("coord", "7.77, 11.11");
+        source.put("null_key", null);
 
         obj = new HashMap<>();
         obj.put("array_str", Arrays.asList("val 1", "val 2", "val 3"));
@@ -34,6 +32,9 @@ class DocumentTest {
         obj.put("array_int", Arrays.asList(11, -4, 123456789, 16384));
         obj.put("inner_str", "inner string value");
         obj.put("array_coord", Arrays.asList("0, 0", "-50, 19.91", "0.1234, 56.789"));
+        obj.put("array_empty", Collections.emptyList());
+        obj.put("array_empty_2", new HashMap<>());
+        obj.put("array_empty_3", new ArrayList<>());
 
         source.put("map", obj);
         source.put("map_put", obj);
@@ -46,16 +47,24 @@ class DocumentTest {
     void toEntity() {
     }
 
-//    @Test
-//    void isNullOrEmpty() {
-//        assertThrows(DocumentException.class, ()->doc.isNullOrEmpty("fake","field","path"));
-//        assertThrows(DocumentException.class, ()->doc.isNullOrEmpty("fake"));
-//    }
+    @Test
+    void isNullOrEmpty() {
+        assertTrue(doc.isNullOrEmpty("fake"));
+        assertTrue(doc.isNullOrEmpty("map", "fake_array"));
+        assertTrue(doc.isNullOrEmpty("map", "array_empty"));
+        assertTrue(doc.isNullOrEmpty("map", "array_empty_2"));
+        assertTrue(doc.isNullOrEmpty("map", "array_empty_3"));
+        assertTrue(doc.isNullOrEmpty("null_key"));
+        assertFalse(doc.isNullOrEmpty("map"));
+        assertFalse(doc.isNullOrEmpty("str"));
+    }
 
     @Test
     void put() {
-        assertThrows(DocumentException.class, ()->doc.put("fake","field","path"));
-        assertThrows(DocumentException.class, ()->doc.put("new_fake_value", "new_fake_key"));
+        assertThrows(DocumentException.class, () -> doc.put("new_value_here","fake", "field", "path"));
+
+        assertNull(doc.put("very_new_value", "completely_new_field"));
+        assertEquals("very_new_value", doc.get("completely_new_field"));
 
         assertEquals("string value", doc.put("new string value", "str_put"));
         assertEquals("new string value", doc.get("str_put"));
@@ -66,8 +75,9 @@ class DocumentTest {
 
     @Test
     void get() {
-        assertThrows(DocumentException.class, ()->doc.isNullOrEmpty("fake","field","path"));
-        assertThrows(DocumentException.class, ()->doc.isNullOrEmpty("fake"));
+        assertThrows(DocumentException.class, () -> doc.get("fake", "field", "path"));
+
+        assertNull(doc.get("non_existing_field"));
 
         assertEquals("string value", doc.get("str"));
         assertEquals(10.4, doc.get("double"));
@@ -100,7 +110,7 @@ class DocumentTest {
     @Test
     void getLongList() {
         assertFalse(doc.getList("map", "array_int").get(0) instanceof Long);
-        assertEquals(11L, doc.getList("map", "array_int").get(0));
+        assertEquals(11L, doc.getLongList("map", "array_int").get(0));
     }
 
     @Test
