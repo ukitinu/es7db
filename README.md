@@ -13,4 +13,5 @@ I decided to (at least temporarily) remove all of its specialised searches/metho
 I wouldn't use this as a library, I don't think that this could ever become a "complete" project.  
 It is rather a starting point to customise as needed, no restrictions whatsoever.  
 
-Some (basic) examples can be found in *src/test*.
+Some (basic) examples can be found in *src/test*.  
+More examples can/will be found in [ukitinu/elastic-spring](https://github.com/ukitinu/elastic-spring).
