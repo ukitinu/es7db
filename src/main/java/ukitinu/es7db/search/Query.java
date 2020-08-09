@@ -1,15 +1,18 @@
 package ukitinu.es7db.search;
 
-import ukitinu.es7db.DatabaseConstants;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ukitinu.es7db.config.Property;
 
 import java.util.function.Consumer;
 
 public class Query implements Queryable {
+    private static final int MINIMUM_SHOULD_DEFAULT = Property.ES_SEARCH_MIN_SHOULD.getInt();
+    private static final int MINIMUM_SHOULD_UNDEFINED = 0;
+
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     private final FilterElements filterList = new FilterElements();
@@ -17,7 +20,7 @@ public class Query implements Queryable {
     private final FilterElements mustNotList = new FilterElements();
     private final FilterElements shouldList = new FilterElements();
     private final FilterElements shouldNotList = new FilterElements();
-    private int minimumShould = DatabaseConstants.MINIMUM_SHOULD_UNDEFINED;
+    private int minimumShould = MINIMUM_SHOULD_UNDEFINED;
 
     FilterElements getFilter() {
         return filterList;
@@ -177,9 +180,9 @@ public class Query implements Queryable {
 
     @Override
     public QueryBuilder toQuery() {
-        if (hasShoulds() && minimumShould == DatabaseConstants.MINIMUM_SHOULD_UNDEFINED) {
-            LOG.warn("Should[Not] entries without setting minimum_should, default to {}", DatabaseConstants.MINIMUM_SHOULD_DEFAULT);
-            return toQuery(DatabaseConstants.MINIMUM_SHOULD_DEFAULT);
+        if (hasShoulds() && minimumShould == MINIMUM_SHOULD_UNDEFINED) {
+            LOG.warn("Should[Not] entries without setting minimum_should, default to {}", MINIMUM_SHOULD_DEFAULT);
+            return toQuery(MINIMUM_SHOULD_DEFAULT);
         }
         return toQuery(minimumShould);
     }

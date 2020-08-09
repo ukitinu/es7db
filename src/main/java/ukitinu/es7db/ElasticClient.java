@@ -1,5 +1,6 @@
 package ukitinu.es7db;
 
+import ukitinu.es7db.config.Property;
 import ukitinu.es7db.exceptions.DatabaseException;
 import ukitinu.es7db.search.Query;
 import ukitinu.es7db.search.Search;
@@ -48,6 +49,24 @@ import java.util.stream.Collectors;
 
 final class ElasticClient
 {
+    private static final String DB_SCHEME = "http";
+    private static final String HOSTNAME = Property.ES_HOST.getString();
+    private static final int HTTP_PORT = Property.ES_PORT.getInt();
+
+    private static final String LOG_BULK_ID_ACTIONS = "Bulk [{}] {} requests";
+    private static final String LOG_BULK_ERROR = "Bulk [{}] error: {}.";
+    private static final String LOG_BULK_EXECUTED = "Bulk [{}] {}.";
+    private static final String LOG_BULK_EXECUTED_GOOD = "succeeded";
+    private static final String LOG_BULK_EXECUTED_FAIL = "failed";
+    private static final int ES_CONFIG_BULK_MAX_SIZE = Property.ES_BULK_MAX_SIZE.getInt();
+    private static final int ES_CONFIG_BULK_FLUSH_SIZE = Property.ES_BULK_FLUSH_MB.getInt();
+    private static final int ES_CONFIG_BULK_FLUSH_TIME = Property.ES_BULK_FLUSH_TIME.getInt();
+    private static final int ES_CONFIG_BULK_CONCURRENTS = Property.ES_BULK_CONCURRENTS.getInt();
+    private static final int ES_CONFIG_BACKOFF_TIME = Property.ES_BACKOFF_TIME.getInt();
+    private static final int ES_CONFIG_BACKOFF_TRIES = Property.ES_BACKOFF_TRIES.getInt();
+    private static final String STORED_FIELDS_NONE = "_none_";
+    private static final int RETRY_ON_CONFLICT_TIMES = Property.ES_UPDATE_CONFLICT_RETRY.getInt();
+
     private static final Logger LOG = LoggerFactory.getLogger(ElasticClient.class);
 
     private final BulkProcessor bulkProcessor;
@@ -64,7 +83,7 @@ final class ElasticClient
     {
         client = new RestHighLevelClient(
                 RestClient.builder(
-                        new HttpHost(DatabaseConstants.HOSTNAME, DatabaseConstants.HTTP_PORT, DatabaseConstants.DB_SCHEME)
+                        new HttpHost(HOSTNAME, HTTP_PORT, DB_SCHEME)
                 )
         );
         bulkProcessor = BulkProcessor.builder(
@@ -75,26 +94,26 @@ final class ElasticClient
                     public void beforeBulk(long executionId, BulkRequest request)
                     {
                         request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
-                        LOG.info(DatabaseConstants.LOG_BULK_ID_ACTIONS, executionId, request.numberOfActions());
+                        LOG.info(LOG_BULK_ID_ACTIONS, executionId, request.numberOfActions());
                     }
 
                     @Override
                     public void afterBulk(long executionId, BulkRequest request, BulkResponse response)
                     {
-                        LOG.debug(DatabaseConstants.LOG_BULK_EXECUTED, executionId, response.hasFailures() ? DatabaseConstants.LOG_BULK_EXECUTED_FAIL : DatabaseConstants.LOG_BULK_EXECUTED_GOOD);
+                        LOG.debug(LOG_BULK_EXECUTED, executionId, response.hasFailures() ? LOG_BULK_EXECUTED_FAIL : LOG_BULK_EXECUTED_GOOD);
                     }
 
                     @Override
                     public void afterBulk(long executionId, BulkRequest request, Throwable failure)
                     {
-                        LOG.error(DatabaseConstants.LOG_BULK_ERROR, executionId, failure.getMessage());
+                        LOG.error(LOG_BULK_ERROR, executionId, failure.getMessage());
                     }
                 })
-                .setBulkActions(DatabaseConstants.ES_CONFIG_BULK_MAX_SIZE)
-                .setBulkSize(new ByteSizeValue(DatabaseConstants.ES_CONFIG_BULK_FLUSH_SIZE, ByteSizeUnit.MB))
-                .setFlushInterval(TimeValue.timeValueSeconds(DatabaseConstants.ES_CONFIG_BULK_FLUSH_TIME))
-                .setConcurrentRequests(DatabaseConstants.ES_CONFIG_BULK_CONCURRENTS)
-                .setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(DatabaseConstants.ES_CONFIG_BACKOFF_TIME), DatabaseConstants.ES_CONFIG_BACKOFF_TRIES))
+                .setBulkActions(ES_CONFIG_BULK_MAX_SIZE)
+                .setBulkSize(new ByteSizeValue(ES_CONFIG_BULK_FLUSH_SIZE, ByteSizeUnit.MB))
+                .setFlushInterval(TimeValue.timeValueSeconds(ES_CONFIG_BULK_FLUSH_TIME))
+                .setConcurrentRequests(ES_CONFIG_BULK_CONCURRENTS)
+                .setBackoffPolicy(BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(ES_CONFIG_BACKOFF_TIME), ES_CONFIG_BACKOFF_TRIES))
                 .build();
     }
 
@@ -130,7 +149,7 @@ final class ElasticClient
     {
         try {
             GetRequest request = new GetRequest(index, id);
-            request.fetchSourceContext(FetchSourceContext.DO_NOT_FETCH_SOURCE).storedFields(DatabaseConstants.STORED_FIELDS_NONE);
+            request.fetchSourceContext(FetchSourceContext.DO_NOT_FETCH_SOURCE).storedFields(STORED_FIELDS_NONE);
             return client.exists(request, RequestOptions.DEFAULT);
         } catch (Exception e) {
             throw DatabaseException.wrapException(e);
@@ -293,7 +312,7 @@ final class ElasticClient
     {
         UpdateRequest request = new UpdateRequest(index, id).doc(update);
         request.docAsUpsert(true);
-        request.retryOnConflict(DatabaseConstants.RETRY_ON_CONFLICT_TIMES);
+        request.retryOnConflict(RETRY_ON_CONFLICT_TIMES);
         request.fetchSource(false);
         return request;
     }
