@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import ukitinu.es7db.exceptions.DocumentException;
 import ukitinu.es7db.search.CoordinatePoint;
 import org.elasticsearch.action.get.GetResponse;
