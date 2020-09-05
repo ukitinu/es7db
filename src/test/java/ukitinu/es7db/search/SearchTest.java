@@ -1,6 +1,6 @@
 package ukitinu.es7db.search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import ukitinu.es7db.config.Property;
 
 import static org.junit.jupiter.api.Assertions.*;

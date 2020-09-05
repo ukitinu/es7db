@@ -27,7 +27,7 @@ class CoordinatePointTest {
         assertDoesNotThrow(()->new CoordinatePoint("11.11'', 7,77'"));
         assertDoesNotThrow(()->new CoordinatePoint("0,0°", "0.0'"));
         assertDoesNotThrow(()->new CoordinatePoint("10''", "1° 2'' 3.3'"));
-        assertDoesNotThrow(()->new CoordinatePoint("10'' (seconds)", "1° 2'' 3.3' (this will be ignored) (alos, notice how minutes and seconds are out of order)"));
+        assertDoesNotThrow(()->new CoordinatePoint("10'' (seconds)", "1° 2'' 3.3' (this will be ignored) (also, notice how minutes and seconds are out of order)"));
         assertDoesNotThrow(()->new CoordinatePoint("10g 05'12.34'' N", "5g 80'11.22'' E"));
 
         assertThrows(IllegalArgumentException.class, ()->new CoordinatePoint("", "0"));

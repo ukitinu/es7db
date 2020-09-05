@@ -6,13 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ukitinu.es7db.exceptions.DocumentException;
 import ukitinu.es7db.search.CoordinatePoint;
+import org.json.JSONObject;
 
 import java.util.*;
 
@@ -53,11 +51,10 @@ class DocumentTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void toEntity() {
         SerialClass obj = SerialClass.getTesterObject();
 
-        Document docObj = new Document("my_index","my_id", obj.toJson());
+        Document docObj = new Document("my_index","my_id", obj.toJson().toMap());
         assertDoesNotThrow(()->docObj.toEntity(SerialClass.class));
 
         SerialClass back = docObj.toEntity(SerialClass.class);
@@ -175,7 +172,6 @@ class DocumentTest {
         private final ObjectMapper objectMapper = new ObjectMapper()
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        private final JSONParser jsonParser = new JSONParser();
 
         @JsonProperty("id")
         private String id;
@@ -204,8 +200,8 @@ class DocumentTest {
         private JSONObject toJson()
         {
             try {
-                return (JSONObject) jsonParser.parse(objectMapper.writeValueAsString(this));
-            } catch (JsonProcessingException | ParseException e) {
+                return new JSONObject(objectMapper.writeValueAsString(this));
+            } catch (JsonProcessingException e) {
                 return new JSONObject();
             }
         }

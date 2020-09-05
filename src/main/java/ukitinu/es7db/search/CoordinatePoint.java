@@ -14,7 +14,7 @@ public class CoordinatePoint {
     private static final int LAT_INDEX = 0;
     private static final int LON_INDEX = 1;
     private static final String STRING_SEPARATOR = ", ";
-    private static final String FMT_DEC = "\\d+(?:[.,]\\d+)?";
+    private static final String FMT_DEC = "-?\\d+(?:[.,]\\d+)?";
     private static final Pattern DEG = Pattern.compile(FMT_DEC + "[g°]");
     private static final Pattern MIN = Pattern.compile(FMT_DEC + "'");
     private static final Pattern SEC = Pattern.compile(FMT_DEC + "''");
