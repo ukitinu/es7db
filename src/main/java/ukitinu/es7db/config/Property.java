@@ -1,7 +1,7 @@
 package ukitinu.es7db.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public enum Property
 {
@@ -57,7 +57,7 @@ public enum Property
         return getString();
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(Property.class);
+    private static final Logger LOG = LogManager.getLogger(Property.class);
 
     private static final String USING_DEFAULT = "Unable to find {}, using default value {}";
 }

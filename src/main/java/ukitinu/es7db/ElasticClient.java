@@ -1,5 +1,7 @@
 package ukitinu.es7db;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ukitinu.es7db.config.Property;
 import ukitinu.es7db.exceptions.DatabaseException;
 import ukitinu.es7db.search.Query;
@@ -37,8 +39,6 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ final class ElasticClient
     private static final String STORED_FIELDS_NONE = "_none_";
     private static final int RETRY_ON_CONFLICT_TIMES = Property.ES_UPDATE_CONFLICT_RETRY.getInt();
 
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticClient.class);
+    private static final Logger LOG = LogManager.getLogger(ElasticClient.class);
 
     private final BulkProcessor bulkProcessor;
     private final RestHighLevelClient client;

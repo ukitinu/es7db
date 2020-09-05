@@ -1,9 +1,9 @@
 package ukitinu.es7db;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
 
 public class HistogramInterval
 {
-    private static final Logger LOG = LoggerFactory.getLogger(HistogramInterval.class);
+
+    private static final Logger LOG = LogManager.getLogger(HistogramInterval.class);
     private static final String BAD_INTERVAL_WARN = "Date Histogram interval \"{}\" not supported, defaulting to \"{}\"";
 
     private static final DateHistogramInterval DEFAULT_INTERVAL = DateHistogramInterval.DAY;

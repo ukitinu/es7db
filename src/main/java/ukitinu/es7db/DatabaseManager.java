@@ -1,10 +1,10 @@
 package ukitinu.es7db;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ukitinu.es7db.exceptions.DatabaseException;
 import ukitinu.es7db.search.Query;
 import ukitinu.es7db.search.Search;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.http.HttpStatus;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public enum DatabaseManager
 {
     INSTANCE;
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);
+    private static final Logger LOG = LogManager.getLogger(DatabaseManager.class);
     private static final ElasticClient CLIENT = ElasticClient.getInstance();
 
     public Document get(String index, String id) throws DatabaseException

@@ -1,10 +1,10 @@
 package ukitinu.es7db.search;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ukitinu.es7db.config.Property;
 
 import java.util.function.Consumer;
@@ -13,7 +13,7 @@ public class Query implements Queryable {
     private static final int MINIMUM_SHOULD_DEFAULT = Property.ES_SEARCH_MIN_SHOULD.getInt();
     private static final int MINIMUM_SHOULD_UNDEFINED = 0;
 
-    private static final Logger LOG = LoggerFactory.getLogger(Query.class);
+    private static final Logger LOG = LogManager.getLogger(Query.class);
 
     private final FilterElements filterList = new FilterElements();
     private final MustElements mustList = new MustElements();
