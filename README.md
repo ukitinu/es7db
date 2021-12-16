@@ -14,4 +14,7 @@ I wouldn't use this as a library, I don't think that this could ever become a "c
 It is rather a starting point to customise as needed, no restrictions whatsoever.  
 
 Some (basic) examples can be found in *src/test*.  
-More examples can/will be found in [ukitinu/elastic-spring](https://github.com/ukitinu/elastic-spring).
+
+## TODOs
+More examples.  
+Multisearch, more aggregations, review code, review builders and constructors, check if **nested queries** are possible, **interfaces**, ...
